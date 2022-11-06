@@ -1,34 +1,51 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import './App.css'
+import React, { useState } from "react";
+import "./App.css";
+import { useGetSynonyms } from "./hooks/useGetSynonyms";
+import { fetchSynonyms } from "./api/fetchSynonyms";
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [word, setWord] = useState("");
+  const { isLoading, synonyms, getSynonyms } = useGetSynonyms();
+
+  const handleFetchSynonyms = (e: React.FormEvent) => {
+    e.preventDefault();
+    getSynonyms(word);
+  };
+
+  const handleSynonymClicked = (newWord: string) => {
+    setWord(newWord);
+    getSynonyms(newWord);
+  };
 
   return (
     <div className="App">
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src="/vite.svg" className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://reactjs.org" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
+      <form onSubmit={handleFetchSynonyms}>
+      <label htmlFor="word-input">
+        Search for a word</label>
+        <input
+          type="text"
+          value={word}
+          onChange={(e) => setWord(e.target.value)}
+          id="word-input"
+        />
+        <input type="submit" value="Submit" />
+
+      </form>
+
+
+    {isLoading ? <div>Loading...</div> : 
+      <ul>
+        {synonyms.map((synonym) => (
+          <li
+            onClick={() => handleSynonymClicked(synonym.word)}
+            key={synonym.word}
+          >
+            {synonym.word}
+          </li>
+        ))}
+      </ul>}
     </div>
-  )
+  );
 }
 
-export default App
+export default App;
